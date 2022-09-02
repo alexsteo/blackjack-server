@@ -1,7 +1,7 @@
 const {Card} = require("./card");
 
 const suits = ["H", "C", "D", "S"];
-const numbers = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10];
+const numbers = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 
 class Player {
     constructor(username, conId) {
@@ -14,11 +14,11 @@ class Player {
     }
 
     calculateScore() {
-        this.score = this.hand.sort((a, b) => a.number - b.number).reduce((acc, current) => {
-            if (current.number === 11 && acc >= 11) {
+        this.score = this.hand.sort((a, b) => a.value - b.value).reduce((acc, current) => {
+            if (current.value === 11 && acc >= 11) {
                 return acc + 1;
             } else {
-                return acc + current.number ;
+                return acc + current.value;
             }
         }, 0);
     }
