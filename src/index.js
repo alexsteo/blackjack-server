@@ -51,11 +51,19 @@ io.on("connection", (socket) => {
     socket.on("draw", () => {
         game.draw(socket.id)
         socket.emit("draw", game.getPlayerById(socket.id).hand);
+        socket.broadcast.emit("opponentDraw");
     });
     socket.on("stay", () => {
         game.getPlayerById(socket.id).stays = true;
         if(!game.players.some(player => player.stays === false)) {
             concludeGame(socket);
+        }
+    });
+    socket.on("nextHand", () => {
+        game.getPlayerById(socket.id).wantsNextGame = true;
+        if(!game.players.some(player => player.wantsNextGame === false)) {
+            game.nextGame();
+            io.emit("nextHand");
         }
     });
 });

@@ -10,6 +10,7 @@ class Player {
         this.hand = [];
         this.score = 0;
         this.stays = false;
+        this.wantsNextGame = false;
     }
 
     calculateScore() {
@@ -21,6 +22,13 @@ class Player {
             }
         }, 0);
     }
+
+    nextGame() {
+        this.hand = [];
+        this.score = 0;
+        this.stays = false;
+        this.wantsNextGame = false;
+    }
 }
 
 class Game {
@@ -28,6 +36,10 @@ class Game {
         this.players = players;
         this.deck = this.createDeck();
         this.discarded = [];
+    }
+
+    nextGame() {
+        this.players.forEach(player => player.nextGame());
     }
 
     getPlayerById(conId) {
