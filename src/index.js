@@ -18,7 +18,6 @@ let game;
 const addPlayer = (player) => {
     players.push(player);
     if(players.length > 1) {
-        console.log("started game");
         game = new Game(players);
     }
 }
@@ -26,14 +25,14 @@ const addPlayer = (player) => {
 const concludeGame = (socket) => {
     const winningPlayer = game.checkWinner();
     if(game.players[0].conId === winningPlayer) {
-        io.to(game.players[0].conId).emit("resultsw", {result: "win", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
-        io.to(game.players[1].conId).emit("resultsl", {result: "lose", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
+        io.to(game.players[0].conId).emit("results", {result: "win", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
+        io.to(game.players[1].conId).emit("results", {result: "lose", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
     } else if(game.players[1].conId === winningPlayer) {
-        io.to(game.players[1].conId).emit("resultsw", {result: "win", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
-        io.to(game.players[0].conId).emit("resultsl", {result: "lose", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
+        io.to(game.players[1].conId).emit("results", {result: "win", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
+        io.to(game.players[0].conId).emit("results", {result: "lose", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
     } else if(winningPlayer === null){
-        io.to(game.players[0].conId).emit("resultsd", {result: "draw", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
-        io.to(game.players[1].conId).emit("resultsd", {result: "draw", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
+        io.to(game.players[0].conId).emit("results", {result: "draw", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
+        io.to(game.players[1].conId).emit("results", {result: "draw", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
     }
 }
 
@@ -48,6 +47,8 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
+    io.emit("players", players.filter(player => player.conId !== socket.id).map(player => player.username));
+    socket.emit("conId", socket.id);
     socket.on("draw", () => {
         game.draw(socket.id)
         socket.emit("draw", game.getPlayerById(socket.id).hand);
@@ -65,6 +66,10 @@ io.on("connection", (socket) => {
             game.nextGame();
             io.emit("nextHand");
         }
+    });
+    socket.on("disconnect", () => {
+        console.log(socket.id)
+        players = players.filter(player => player.conId !== socket.id);
     });
 });
 
