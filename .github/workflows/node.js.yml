@@ -18,11 +18,8 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - uses: actions/checkout@v3
-    - name: 'Create env file'
-      run: |
-        touch .env    
-        echo CORS_ORIGIN=${{ secrets.CORS_ORIGIN }} >> .env
-        cat .env
+    - name: 'set Port'
+      run: export PORT=3001
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
