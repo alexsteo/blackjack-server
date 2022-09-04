@@ -6,7 +6,7 @@ const {Player} = require("./objects/player");
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
-        origin: "*",
+        origin: ["http://localhost:3000", "https://blackjack-client-teo.herokuapp.com/"],
         credentials: true
     }
 });
