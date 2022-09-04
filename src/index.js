@@ -1,13 +1,12 @@
 const {createServer} = require("http");
 const {Server} = require("socket.io");
-const {Card} = require("./objects/card");
 const {Game, Player} = require("./objects/game");
+require("../.env");
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:3000",
-        allowedHeaders: ["my-custom-header"],
+        origin: CORS_ORIGIN,
         credentials: true
     }
 });
@@ -17,22 +16,52 @@ let game;
 
 const addPlayer = (player) => {
     players.push(player);
-    if(players.length > 1) {
+    if (players.length > 1) {
         game = new Game(players);
     }
 }
 
 const concludeGame = () => {
     const winningPlayer = game.checkWinner();
-    if(game.players[0].conId === winningPlayer) {
-        io.to(game.players[0].conId).emit("results", {result: "win", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
-        io.to(game.players[1].conId).emit("results", {result: "lose", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
-    } else if(game.players[1].conId === winningPlayer) {
-        io.to(game.players[1].conId).emit("results", {result: "win", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
-        io.to(game.players[0].conId).emit("results", {result: "lose", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
-    } else if(winningPlayer === null){
-        io.to(game.players[0].conId).emit("results", {result: "draw", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
-        io.to(game.players[1].conId).emit("results", {result: "draw", score: game.players[1].score, other: game.players[0].score, otherCards: game.players[0].hand})
+    if (game.players[0].conId === winningPlayer) {
+        io.to(game.players[0].conId).emit("results", {
+            result: "win",
+            score: game.players[0].score,
+            other: game.players[1].score,
+            otherCards: game.players[1].hand
+        })
+        io.to(game.players[1].conId).emit("results", {
+            result: "lose",
+            score: game.players[1].score,
+            other: game.players[0].score,
+            otherCards: game.players[0].hand
+        })
+    } else if (game.players[1].conId === winningPlayer) {
+        io.to(game.players[1].conId).emit("results", {
+            result: "win",
+            score: game.players[1].score,
+            other: game.players[0].score,
+            otherCards: game.players[0].hand
+        })
+        io.to(game.players[0].conId).emit("results", {
+            result: "lose",
+            score: game.players[0].score,
+            other: game.players[1].score,
+            otherCards: game.players[1].hand
+        })
+    } else if (winningPlayer === null) {
+        io.to(game.players[0].conId).emit("results", {
+            result: "draw",
+            score: game.players[0].score,
+            other: game.players[1].score,
+            otherCards: game.players[1].hand
+        })
+        io.to(game.players[1].conId).emit("results", {
+            result: "draw",
+            score: game.players[1].score,
+            other: game.players[0].score,
+            otherCards: game.players[0].hand
+        })
     }
 }
 
@@ -56,13 +85,13 @@ io.on("connection", (socket) => {
     });
     socket.on("stay", () => {
         game.getPlayerById(socket.id).stays = true;
-        if(!game.players.some(player => player.stays === false)) {
+        if (!game.players.some(player => player.stays === false)) {
             concludeGame(socket);
         }
     });
     socket.on("nextHand", () => {
         game.getPlayerById(socket.id).wantsNextGame = true;
-        if(!game.players.some(player => player.wantsNextGame === false)) {
+        if (!game.players.some(player => player.wantsNextGame === false)) {
             game.nextGame();
             io.emit("nextHand");
         }
@@ -75,7 +104,7 @@ io.on("connection", (socket) => {
 
 io.on("stay", (socket) => {
     game.getPlayerById(socket.id).stays = true;
-    if(!game.players.some(player => player.stays === false)) {
+    if (!game.players.some(player => player.stays === false)) {
         concludeGame();
     }
 });
