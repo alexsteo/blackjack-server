@@ -1,7 +1,8 @@
 const {createServer} = require("http");
 const {Server} = require("socket.io");
-const {Game, Player} = require("./objects/game");
+const {Game} = require("./objects/game");
 require("../.env");
+const {Player} = require("./objects/player");
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -76,8 +77,8 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-    io.emit("players", players.filter(player => player.conId !== socket.id).map(player => player.username));
     socket.emit("conId", socket.id);
+
     socket.on("draw", () => {
         game.draw(socket.id)
         socket.emit("draw", game.getPlayerById(socket.id).hand);
@@ -97,7 +98,6 @@ io.on("connection", (socket) => {
         }
     });
     socket.on("disconnect", () => {
-        console.log(socket.id)
         players = players.filter(player => player.conId !== socket.id);
     });
 });
