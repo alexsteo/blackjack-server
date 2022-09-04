@@ -109,7 +109,8 @@ io.on("stay", (socket) => {
     }
 });
 
-httpServer.listen(3001);
+console.log(process.env.PORT)
+httpServer.listen(process.env.PORT || 3001);
 
 
 
