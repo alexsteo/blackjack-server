@@ -22,7 +22,7 @@ const addPlayer = (player) => {
     }
 }
 
-const concludeGame = (socket) => {
+const concludeGame = () => {
     const winningPlayer = game.checkWinner();
     if(game.players[0].conId === winningPlayer) {
         io.to(game.players[0].conId).emit("results", {result: "win", score: game.players[0].score, other: game.players[1].score, otherCards: game.players[1].hand})
