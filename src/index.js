@@ -11,7 +11,6 @@ const io = new Server(httpServer, {
     }
 });
 
-console.log(CORS_ORIGIN);
 
 let players = [];
 let game;
