@@ -1,7 +1,6 @@
 const {createServer} = require("http");
 const {Server} = require("socket.io");
 const {Game} = require("./objects/game");
-require("../.env");
 const {Player} = require("./objects/player");
 
 const httpServer = createServer();
